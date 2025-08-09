@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <h2>微信扫码登录测试</h2>
+    <p class="login-instructions">请使用微信扫描下方二维码进行登录</p>
+
+    <div class="qr-code">
+        {% if qr_url %}
+            <img src="{{ qr_url }}" alt="微信登录二维码">
+        {% else %}
+            <div class="qr-code-placeholder">二维码加载失败</div>
+        {% endif %}
+    </div>
+
+    <div id="login-status" class="login-status status-pending">
+        等待扫描二维码...
+    </div>
+
+    <p>票据ID: {{ ticket_id }}</p>
+
+    <div style="margin-top: 20px; background-color: #f5f5f5; padding: 10px; border-radius: 5px;">
+        <h3>调试信息</h3>
+        <p style="word-break: break-all; font-size: 12px;">
+            <strong>授权URL:</strong> {{ auth_url }}
+        </p>
+    </div>
+
+    <a href="{{ url_for('home') }}" class="btn" style="background: #666; margin-top: 20px;">返回首页</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 定期检查登录状态
+    const ticketId = "{{ ticket_id }}";
+    const statusElement = document.getElementById('login-status');
+
+    function checkLoginStatus() {
+        fetch(`/check_login_status/${ticketId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('登录状态:', data);
+                switch(data.status) {
+                    case 'pending':
+                        statusElement.className = 'login-status status-pending';
+                        statusElement.textContent = '等待扫描二维码...';
+                        break;
+                    case 'scanned':
+                        statusElement.className = 'login-status status-scanned';
+                        statusElement.textContent = '二维码已扫描，请在微信中确认登录...';
+                        break;
+                    case 'confirmed':
+                        statusElement.className = 'login-status status-confirmed';
+                        statusElement.textContent = '登录成功，正在跳转...';
+                        // 延迟跳转以显示成功消息
+                        setTimeout(() => {
+                            window.location.href = "{{ url_for('home') }}";
+                        }, 1000);
+                        break;
+                    default:
+                        statusElement.className = 'login-status status-pending';
+                        statusElement.textContent = '二维码已失效，请刷新页面重试';
+                        break;
+                }
+            })
+            .catch(error => {
+                console.error('检查登录状态时出错:', error);
+                statusElement.textContent = '检查登录状态时出错，请刷新页面重试';
+            });
+    }
+
+    // 每2秒检查一次登录状态
+    setInterval(checkLoginStatus, 2000);
+
+    // 页面加载时立即检查一次
+    checkLoginStatus();
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container" style="max-width: 800px;">
+    <h2>微信配置测试</h2>
+
+    <div style="text-align: left; background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <h3>当前配置</h3>
+        <p><strong>平台类型:</strong> {{ config.platform_type }}</p>
+        <p><strong>AppID:</strong> {{ config.appid }}</p>
+        <p><strong>重定向URI:</strong> {{ config.redirect_uri }}</p>
+        <p><strong>编码后的重定向URI:</strong> {{ config.encoded_redirect_uri }}</p>
+
+        <h3>授权URL</h3>
+        <p style="word-break: break-all; font-size: 14px;">{{ config.auth_url }}</p>
+
+        <div style="margin-top: 20px;">
+            <a href="{{ config.auth_url }}" class="btn" target="_blank">测试授权链接</a>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <h3>测试链接</h3>
+        <p><a href="{{ url_for('test_wechat_login') }}" class="btn">测试微信扫码登录</a></p>
+        <p style="margin-top: 10px;"><a href="{{ url_for('test_direct_login') }}" class="btn" style="background: #4CAF50;">测试直接登录（无需扫码）</a></p>
+    </div>
+
+    <a href="{{ url_for('home') }}" class="btn" style="background: #666; margin-top: 20px;">返回首页</a>
+</div>
+{% endblock %}

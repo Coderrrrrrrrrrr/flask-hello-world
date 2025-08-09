@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-images">
+        <img src="{{ product.image }}" alt="{{ product.title }}" class="product-detail-image">
+    </div>
+    <div class="product-detail-info">
+        <h2>{{ product.title }}</h2>
+        <p class="product-detail-price">¥{{ product.price }} <small>¥{{ product.price * 1.2 | round(2) }}</small></p>
+        <p class="product-sales">销量: {{ (product.id * 123) }}件</p>
+        <div class="product-detail-description">
+            <p>这是一件高质量的商品，采用优质材料制作，工艺精良，品质可靠。我们提供完善的售后服务，支持7天无理由退换货，让您购物无忧。</p>
+            <p>商品特点：</p>
+            <ul>
+                <li>高品质材料，经久耐用</li>
+                <li>精美工艺，细节考究</li>
+                <li>符合人体工学设计</li>
+                <li>品牌保证，售后无忧</li>
+            </ul>
+        </div>
+        <a href="#" class="btn">立即购买</a>
+        <a href="{{ url_for('home') }}" class="btn" style="background: #666;">返回首页</a>
+    </div>
+</div>
+{% endblock %}

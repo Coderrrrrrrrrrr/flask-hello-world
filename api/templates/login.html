@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    {% if login_type == 'wechat' %}
+        <h2>微信扫码登录</h2>
+        <p class="login-instructions">请使用微信扫描下方二维码进行登录</p>
+        
+        <div class="qr-code">
+            {% if qr_url %}
+                <img src="{{ qr_url }}" alt="微信登录二维码">
+            {% else %}
+                <div class="qr-code-placeholder">二维码加载失败</div>
+            {% endif %}
+        </div>
+        
+        <div id="login-status" class="login-status status-pending">
+            等待扫描二维码...
+        </div>
+        
+        <p>票据ID: {{ ticket_id }}</p>
+        
+        <div class="login-switch">
+            <p>使用账号密码登录？<a href="{{ url_for('login') }}">点击这里</a></p>
+        </div>
+    {% else %}
+        <h2>账号密码登录</h2>
+        <p class="login-instructions">请输入您的账号和密码</p>
+        
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form class="login-form" method="POST">
+            <div class="form-group">
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn">登录</button>
+        </form>
+        
+        <div class="login-switch">
+            <p>使用微信扫码登录？<a href="{{ url_for('login', type='wechat') }}">点击这里</a></p>
+        </div>
+    {% endif %}
+    
+    <a href="{{ url_for('home') }}" class="btn" style="background: #666;">返回首页</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if login_type == 'wechat' %}
+<script>
+    // 定期检查登录状态
+    const ticketId = "{{ ticket_id }}";
+    const statusElement = document.getElementById('login-status');
+    
+    function checkLoginStatus() {
+        fetch(`/check_login_status/${ticketId}`)
+            .then(response => response.json())
+            .then(data => {
+                switch(data.status) {
+                    case 'pending':
+                        statusElement.className = 'login-status status-pending';
+                        statusElement.textContent = '等待扫描二维码...';
+                        break;
+                    case 'scanned':
+                        statusElement.className = 'login-status status-scanned';
+                        statusElement.textContent = '二维码已扫描，请在微信中确认登录...';
+                        break;
+                    case 'confirmed':
+                        statusElement.className = 'login-status status-confirmed';
+                        statusElement.textContent = '登录成功，正在跳转...';
+                        // 延迟跳转以显示成功消息
+                        setTimeout(() => {
+                            window.location.href = "{{ url_for('home') }}";
+                        }, 1000);
+                        break;
+                    default:
+                        statusElement.className = 'login-status status-pending';
+                        statusElement.textContent = '二维码已失效，请刷新页面重试';
+                        break;
+                }
+            })
+            .catch(error => {
+                console.error('检查登录状态时出错:', error);
+            });
+    }
+    
+    // 每2秒检查一次登录状态
+    setInterval(checkLoginStatus, 2000);
+    
+    // 页面加载时立即检查一次
+    checkLoginStatus();
+</script>
+{% endif %}
+{% endblock %}

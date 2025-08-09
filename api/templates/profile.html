@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <img src="{{ user.avatar }}" alt="{{ user.nickname or user.username }}" class="profile-avatar">
+        <div class="profile-info">
+            <h2>{{ user.nickname or user.username }}</h2>
+            <p>欢迎回来！</p>
+            <p>用户ID: {{ user.id }}</p>
+        </div>
+    </div>
+    
+    <div class="profile-details">
+        <h3>用户详细信息</h3>
+        <div class="user-info-item">
+            <div class="user-info-label">用户名:</div>
+            <div class="user-info-value">{{ user.username }}</div>
+        </div>
+        <div class="user-info-item">
+            <div class="user-info-label">昵称:</div>
+            <div class="user-info-value">{{ user.nickname or '未设置' }}</div>
+        </div>
+        {% if user.info %}
+            <div class="user-info-item">
+                <div class="user-info-label">性别:</div>
+                <div class="user-info-value">
+                    {% if user.info.sex == 1 %}男
+                    {% elif user.info.sex == 2 %}女
+                    {% else %}未知
+                    {% endif %}
+                </div>
+            </div>
+            <div class="user-info-item">
+                <div class="user-info-label">城市:</div>
+                <div class="user-info-value">{{ user.info.city }}</div>
+            </div>
+            <div class="user-info-item">
+                <div class="user-info-label">省份:</div>
+                <div class="user-info-value">{{ user.info.province }}</div>
+            </div>
+            <div class="user-info-item">
+                <div class="user-info-label">国家:</div>
+                <div class="user-info-value">{{ user.info.country }}</div>
+            </div>
+            <div class="user-info-item">
+                <div class="user-info-label">语言:</div>
+                <div class="user-info-value">{{ user.info.language }}</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

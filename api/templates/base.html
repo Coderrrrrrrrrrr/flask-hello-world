@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - 电商网站{% else %}电商网站{% endif %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* 顶部导航栏 */
+        .navbar {
+            background: linear-gradient(to right, #ff4444, #ff6600);
+            padding: 0 5%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            margin-left: auto;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: white;
+            margin-left: 15px;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        /* 页面标题 */
+        h2 {
+            margin: 20px 0;
+            font-size: 24px;
+            color: #333;
+            border-left: 4px solid #ff4444;
+            padding-left: 10px;
+        }
+        
+        /* 商品网格 */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        /* 商品卡片 */
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(to right, #ff4444, #ff6600);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-title {
+            font-size: 16px;
+            margin: 0 0 10px 0;
+            color: #333;
+            height: 40px;
+            overflow: hidden;
+        }
+        
+        .product-price {
+            font-size: 20px;
+            color: #ff4444;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .product-price small {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .product-sales {
+            font-size: 13px;
+            color: #999;
+            margin: 5px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, #ff4444, #ff6600);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #ff2222, #ff5500);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 68, 68, 0.3);
+        }
+        
+        /* 商品详情页面 */
+        .product-detail {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .product-detail-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .product-detail-info h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .product-detail-price {
+            font-size: 32px;
+            color: #ff4444;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .product-detail-price small {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+        
+        .product-detail-description {
+            color: #666;
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        /* 关于页面 */
+        .about-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            line-height: 1.8;
+        }
+        
+        .about-content h2 {
+            border: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        .about-content p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        /* 登录页面 */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+        
+        .qr-code img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .login-instructions {
+            margin: 20px 0;
+            color: #666;
+        }
+        
+        .login-status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .status-pending {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-scanned {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status-confirmed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        /* 用户资料页面 */
+        .profile-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        
+        .profile-info h2 {
+            margin-bottom: 10px;
+        }
+        
+        .profile-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .profile-details {
+            margin-top: 20px;
+        }
+        
+        .profile-details h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-info-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .user-info-label {
+            width: 120px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .user-info-value {
+            flex: 1;
+            color: #666;
+        }
+        
+        /* 登录表单 */
+        .login-form {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
+        
+        .login-switch {
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        .login-switch a {
+            color: #ff4444;
+            text-decoration: none;
+        }
+        
+        /* 页脚 */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 10px;
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 10px 0 0 0;
+                width: 100%;
+            }
+            
+            .nav-links {
+                margin-left: auto;
+            }
+            
+            .products {
+                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .user-info-item {
+                flex-direction: column;
+            }
+            
+            .user-info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">电商网站</a>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索商品...">
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">首页</a>
+            <a href="{{ url_for('about') }}">关于我们</a>
+            {% if user %}
+                <a href="{{ url_for('profile') }}">个人资料</a>
+                <div class="user-info">
+                    <img src="{{ user.avatar }}" alt="头像" class="user-avatar">
+                    <span>{{ user.nickname or user.username }}</span>
+                    <a href="{{ url_for('logout') }}" style="color: white; margin-left: 10px;">退出</a>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login') }}">登录</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2023 电商网站. 保留所有权利.</p>
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
